@@ -73,6 +73,16 @@ namespace Sitecore.Support.Analytics
         }
         catch (Exception arg)
         {
+          if (arg is AggregateException)
+          {
+            var exception = arg.InnerException as EntityOperationException;
+            if (exception != null && exception.Result == SaveResultStatus.AlreadyExists)
+            {
+              Log.Debug("[Analytics]: Sitecore.Support.145221 Cannot submit pending item since it already exists. Item is skipped.");
+              continue;
+            }
+          }
+
           Log.Debug("[Analytics]: Cannot submit pending item: " + arg);
           this.submitQueue.Enqueue(submitQueueEntry);
           break;
