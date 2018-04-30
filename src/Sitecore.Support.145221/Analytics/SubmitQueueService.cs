@@ -12,6 +12,7 @@ namespace Sitecore.Support.Analytics
   {
     private readonly SubmitQueue submitQueue;
 
+    private readonly SubmitQueue existingRecordssubmitQueue;
     private AlarmClock alarm;
 
     public int Interval
@@ -23,6 +24,7 @@ namespace Sitecore.Support.Analytics
     public SubmitQueueService()
     {
       this.submitQueue = (Factory.CreateObject("submitQueue/queue", true) as SubmitQueue);
+      this.existingRecordssubmitQueue = (Factory.CreateObject("submitQueue/existingRecordQueue", true) as SubmitQueue);
     }
 
     public void Dispose()
@@ -79,6 +81,7 @@ namespace Sitecore.Support.Analytics
             if (exception != null && exception.Result == SaveResultStatus.AlreadyExists)
             {
               Log.Debug("[Analytics]: Sitecore.Support.145221 Cannot submit pending item since it already exists. Item is skipped.");
+              existingRecordssubmitQueue.Enqueue(submitQueueEntry);
               continue;
             }
           }
